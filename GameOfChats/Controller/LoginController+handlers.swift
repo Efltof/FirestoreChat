@@ -43,7 +43,6 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
                 let storage = Storage.storage().reference().child("profile_images").child("\(imageName).jpg")
                 let image = self.profileImageView.image
                 if let uploadData = image?.jpegData(compressionQuality: 0.1) {
-//                if let uploadData = image?.pngData() { put fullsize image
                     storage.putData(uploadData, metadata: nil, completion: { (metadata, error) in
                         if error != nil {
                             print(error)
@@ -69,11 +68,8 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
         ref.setData(dataToAdd, completion: { (error) in
             if error != nil {
                 print(error!)
-                print("не регает")
             } else {
-                print("Successfuly saved user name in db")
-                print("Document added with ID \(uid ?? "non")")
-                print(ref)
+                
                 let user = User()
                 user.userName = dataToAdd["userName"] as? String
                 user.profileImageUrl = dataToAdd["profileImageUrl"] as? String

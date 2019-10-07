@@ -27,12 +27,11 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     
     var videoUrl : URL?
     
-    //FIX: How to sort messages in array properly
     //MARK: ObserveMessages
     func observeMessages() {
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+        guard let uid = Auth.auth().currentUser?.uid, let toId = user?.id else { return }
         
-        let ref = Firestore.firestore().collection("user-messages").document(uid).collection("messages")
+        let ref = Firestore.firestore().collection("user-messages").document(uid).collection("users").document(toId).collection("messages")
         
         ref.addSnapshotListener { (snapshot, error) in
             snapshot?.documentChanges.forEach({ (diff) in
@@ -43,21 +42,17 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     guard let dictionary = document?.data() as? [String : Any] else { return }
                     
                     let message = Message(dictionary: dictionary)
-                    //FIXME: Отправленное сообщение подгружается 3 раза
+                    
                     print("we fetched this message \(message.text)")
                     if message.chatPartnerId() == self.user?.id {
                         self.messages.append(message)
-//                        self.messages.sorted(by: { (message1, message2) -> Bool in
-//                            return Int32(message1.timestamp!) > Int32(message2.timestamp!)
-//                        })
+
                         DispatchQueue.main.async {
                             self.collectionView.reloadData()
                             let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
                             self.collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
                         }
                     }
-                    
-                    
                 })
             })
         }
@@ -419,11 +414,19 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                 print("success")
                 
                 let messageId = ref.documentID
-                let userMessageRef = Firestore.firestore().collection("user-messages").document("\(fromId!)").collection("messages").document(messageId)
+                //step 1
+                let userRef = Firestore.firestore().collection("user-messages").document(fromId!).collection("users").document(toId!)
+                userRef.setData([toId! : 1])
+                //step 2
+                let userMessageRef =  Firestore.firestore().collection("user-messages").document(fromId!).collection("users").document(toId!).collection("messages").document(messageId)
                 
                 userMessageRef.setData([messageId : 1])
                 
-                let recipienUserMessageRef = Firestore.firestore().collection("user-messages").document("\(toId!)").collection("messages").document(messageId)
+                //step 1
+                let recipienUserRef = Firestore.firestore().collection("user-messages").document(toId!).collection("users").document(fromId!)
+                recipienUserRef.setData([fromId! : 1])
+                
+                let recipienUserMessageRef = Firestore.firestore().collection("user-messages").document(toId!).collection("users").document(fromId!).collection("messages").document(messageId)
                 
                 recipienUserMessageRef.setData([messageId : 1])
                 

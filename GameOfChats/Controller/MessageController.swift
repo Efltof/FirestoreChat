@@ -26,50 +26,54 @@ class MessageController: UITableViewController {
         
         tableView.register(UserCell.self, forCellReuseIdentifier: cellId)
         
-        
-        
-        //observeMessages()
-        
-     
-        
-        
     }
     
     var messages = [Message]()
     
     var messagesDictionary = [String : Message]()
     
+    
+    //FIXME:
     func observeUserMessages() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
-        let ref = Firestore.firestore().collection("user-messages").document(uid).collection("messages")
+        let ref = Firestore.firestore().collection("user-messages").document(uid).collection("users")
+        
+        
         ref.addSnapshotListener { (DocumentSnapshot, error) in
-            
             DocumentSnapshot?.documentChanges.forEach({ (diff) in
-                print(diff.document.data())
-                let messageID = diff.document.documentID
-                let messageRef = Firestore.firestore().collection("messages").document(messageID)
+                let toId = diff.document.documentID
                 
-                messageRef.getDocument(completion: { (document, error) in
-                    guard let dataFromDocument = document?.data() else { return }
-                    let message = Message(dictionary: dataFromDocument)
-                    
-                    // self.messages.append(message)
-                    
-                    if let chatPartnerId = message.chatPartnerId() {
-                        self.messagesDictionary[chatPartnerId] = message
-                        self.messages = Array(self.messagesDictionary.values)
+                let newRef = Firestore.firestore().collection("user-messages").document(uid).collection("users").document(toId).collection("messages")
+                    newRef.addSnapshotListener { (querySnapshot, error) in
+                        querySnapshot?.documentChanges.forEach({ (diffInMessages) in
                         
-                        self.messages.sort(by: { (message1, message2) -> Bool in
-                            return Int32(message1.timestamp!) > Int32(message2.timestamp!)
+                            let messageID = diffInMessages.document.documentID
                             
+                            let messageRef = Firestore.firestore().collection("messages").document(messageID)
+                            
+                            messageRef.getDocument(completion: { (document, error) in
+                                guard let dataFromDocument = document?.data() else { return }
+                                let message = Message(dictionary: dataFromDocument)
+                                
+                                // self.messages.append(message)
+                                
+                                if let chatPartnerId = message.chatPartnerId() {
+                                    self.messagesDictionary[chatPartnerId] = message
+                                    self.messages = Array(self.messagesDictionary.values)
+                                    
+                                    self.messages.sort(by: { (message1, message2) -> Bool in
+                                        return Int32(message1.timestamp!) > Int32(message2.timestamp!)
+                                        
+                                    })
+                                }
+                                DispatchQueue.main.async {
+                                    print("reload")
+                                    self.tableView.reloadData()
+                                }
+                            })
                         })
-                    }
-                    DispatchQueue.main.async {
-                        print("reload")
-                        self.tableView.reloadData()
-                    }
-                })
+                }
             })
         }
     }
@@ -145,21 +149,18 @@ class MessageController: UITableViewController {
     
     func fetchUserAndSetupNavBarTitle() {
         guard let uid = Auth.auth().currentUser?.uid else { return }
-        print(uid)
+        
         let docRef = Firestore.firestore().collection("users").document(uid)
         docRef.getDocument { (document, error) in
             if let dictionary = document?.data() {
-                print("Document data: \(dictionary)")
                 
                 let user = User()
                 user.userName = dictionary["userName"] as? String
                 user.email = dictionary["email"] as? String
                 user.profileImageUrl = dictionary["profileImageUrl"] as? String
                 
-                //FIXME: - Create a imageview in title on navbar (ep 7)
-                
                 self.setupNavBarWithUser(user: user)
-//                self.navigationItem.title = user.userName
+                
             } else {
                 print("Document is not exist")
             }
@@ -178,7 +179,7 @@ class MessageController: UITableViewController {
         
         let titleView = UIView()
         titleView.frame = CGRect(x: 0, y: 0, width: 100, height: 40)
-//        titleView.backgroundColor = UIColor.red
+
         titleView.isUserInteractionEnabled = true
         
         let containerView = UIView()
@@ -196,7 +197,6 @@ class MessageController: UITableViewController {
         
         containerView.addSubview(profileImageView)
         
-        //ios 9 constraint anchors
         //need x,y,width,height anchors
         profileImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
         profileImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
@@ -219,7 +219,6 @@ class MessageController: UITableViewController {
         
     
         self.navigationItem.titleView = titleView
-//        self.navigationController?.navigationBar.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(showChatController)))
         self.navigationController?.navigationBar.isUserInteractionEnabled = true
         
      }

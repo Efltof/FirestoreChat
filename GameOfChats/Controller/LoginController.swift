@@ -70,9 +70,6 @@ class LoginController: UIViewController {
         }
     }
     
-   
-    
-    
     let nameTextField : UITextField =  {
         let tf = UITextField()
         tf.placeholder = "Name"
@@ -139,10 +136,7 @@ class LoginController: UIViewController {
         let title = loginRegisterSegmentedControl.titleForSegment(at: loginRegisterSegmentedControl.selectedSegmentIndex)
         loginRegisterButton.setTitle(title, for: .normal)
         
-        //Change height of inputContainerView
         inputContainerViewHeightAnchor?.constant = loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 100 : 150
-        
-        //Change height of Fields
         
         nameTextFieldHeightAnchor?.isActive = false
         nameTextFieldHeightAnchor = nameTextField.heightAnchor.constraint(equalTo: inputContainer.heightAnchor, multiplier: loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 0 : 1/3)
@@ -156,9 +150,6 @@ class LoginController: UIViewController {
         passwordTextFieldHeightAnchor = passwordTextField.heightAnchor.constraint(equalTo: inputContainer.heightAnchor, multiplier: loginRegisterSegmentedControl.selectedSegmentIndex == 0 ? 1/2 : 1/3)
         passwordTextFieldHeightAnchor?.isActive = true
     }
-    
-    
-    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -186,15 +177,11 @@ class LoginController: UIViewController {
     var passwordTextFieldHeightAnchor : NSLayoutConstraint?
     
     func setupLoginRegisterSegmentedControl() {
-        //need x, y, height, weight constraints
+//        x, y, height, weight constraints
         loginRegisterSegmentedControl.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         loginRegisterSegmentedControl.bottomAnchor.constraint(equalTo: inputContainer.topAnchor, constant: -12).isActive = true
         loginRegisterSegmentedControl.widthAnchor.constraint(equalTo: inputContainer.widthAnchor).isActive = true
         loginRegisterSegmentedControl.heightAnchor.constraint(equalToConstant: 40).isActive = true
-        
-        
-        
-        
     }
     
     func setupinputContainerView() {
@@ -237,8 +224,6 @@ class LoginController: UIViewController {
         passwordTextField.widthAnchor.constraint(equalTo: inputContainer.widthAnchor).isActive = true
         passwordTextFieldHeightAnchor = passwordTextField.heightAnchor.constraint(equalTo: inputContainer.heightAnchor, multiplier: 1/3)
         passwordTextFieldHeightAnchor?.isActive = true
-        
-        
     }
     
     func setupLoginRegisterButton() {

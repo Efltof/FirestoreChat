@@ -27,7 +27,7 @@
 
 /* Begin PBXFileReference section */
 		11528FFB22DE3DEF00CAB7E2 /* ChatLogController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogController.swift; sourceTree = "<group>"; };
-		11805B6C22D22EF600F52859 /* GameOfChats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GameOfChats.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11805B6C22D22EF600F52859 /* FirestoreChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FirestoreChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		11805B6F22D22EF700F52859 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		11805B7122D22EF700F52859 /* MessageController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageController.swift; sourceTree = "<group>"; };
 		11805B7422D22EF700F52859 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -73,7 +73,7 @@
 		11805B6D22D22EF600F52859 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				11805B6C22D22EF600F52859 /* GameOfChats.app */,
+				11805B6C22D22EF600F52859 /* FirestoreChat.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -169,7 +169,7 @@
 			);
 			name = GameOfChats;
 			productName = GameOfChats;
-			productReference = 11805B6C22D22EF600F52859 /* GameOfChats.app */;
+			productReference = 11805B6C22D22EF600F52859 /* FirestoreChat.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -452,8 +452,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Efltof.GameOfChats;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.Efltof.FirestoreChat;
+				PRODUCT_NAME = FirestoreChat;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -472,8 +472,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.Efltof.GameOfChats;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.Efltof.FirestoreChat;
+				PRODUCT_NAME = FirestoreChat;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
