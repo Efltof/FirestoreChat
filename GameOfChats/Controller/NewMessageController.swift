@@ -8,6 +8,7 @@
 
 import UIKit
 import FirebaseFirestore
+import FirebaseAuth
 
 class NewMessageController: UITableViewController {
     
@@ -38,11 +39,9 @@ class NewMessageController: UITableViewController {
                     user.profileImageUrl = document.data()["profileImageUrl"] as? String
                     user.id = document.documentID
                     
-                    
-                    
                     self.users.append(user)
                     
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
                         self.tableView.reloadData()
                     }
                     

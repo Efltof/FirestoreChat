@@ -2,11 +2,11 @@
   "images" : [
     {
       "idiom" : "universal",
+      "filename" : "man.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "alena-aenami-away-1k.jpg",
       "scale" : "2x"
     },
     {

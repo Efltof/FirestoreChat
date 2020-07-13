@@ -67,8 +67,7 @@ class MessageController: UITableViewController {
                                         
                                     })
                                 }
-                                DispatchQueue.main.async {
-                                    print("reload")
+                                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
                                     self.tableView.reloadData()
                                 }
                             })
@@ -77,15 +76,6 @@ class MessageController: UITableViewController {
             })
         }
     }
-    var timer : Timer?
-    //FIXME: Add timer 
-    @objc func handleReloadTable() {
-        DispatchQueue.main.async {
-            print("reload")
-            self.tableView.reloadData()
-        }
-    }
-    
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messages.count
@@ -107,7 +97,6 @@ class MessageController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
        let message = messages[indexPath.row]
-        print(message)
         
         guard let chatPartnerId = message.chatPartnerId() else { return }
         
@@ -116,7 +105,7 @@ class MessageController: UITableViewController {
             if error != nil {
                 print(error)
             } else {
-                print(DocumentSnapshot)
+                
                 guard let dictionary = DocumentSnapshot?.data() else { return }
                 let user = User()
                 
@@ -161,15 +150,11 @@ class MessageController: UITableViewController {
                 
                 self.setupNavBarWithUser(user: user)
                 
-            } else {
-                print("Document is not exist")
             }
         }
     }
     
     func setupNavBarWithUser(user: User) {
-        
-        
         messages.removeAll()
         messagesDictionary.removeAll()
         

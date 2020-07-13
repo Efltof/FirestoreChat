@@ -10,7 +10,6 @@ import UIKit
 import Firebase
 import FirebaseAuth
 
-
 extension UIViewController {
     func hideKeyboard() {
         view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard)))
@@ -55,7 +54,6 @@ class LoginController: UIViewController {
     
     @objc func handleLogin() {
         guard let email = emailTextField.text, let password = passwordTextField.text else  {
-            print("Email or password is not correct")
             return
         }
         
@@ -63,7 +61,6 @@ class LoginController: UIViewController {
             if error != nil {
                 print(error)
             } else {
-                print("success login")
                 self.messagesController?.fetchUserAndSetupNavBarTitle()
                 self.dismiss(animated: true, completion: nil)
             }
@@ -88,7 +85,7 @@ class LoginController: UIViewController {
         return tf
     }()
     
-    let passwordTextField : UITextField =  {
+    let passwordTextField : UITextField = {
         let tf = UITextField()
         tf.placeholder = "Password"
         tf.translatesAutoresizingMaskIntoConstraints = false

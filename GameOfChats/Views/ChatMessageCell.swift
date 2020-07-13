@@ -24,7 +24,6 @@ class ChatMessageCell: UICollectionViewCell {
     
     let textView : UITextView = {
         let tv = UITextView()
-        tv.text = "Sample TEXT"
         tv.font = UIFont.boldSystemFont(ofSize: 16)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.backgroundColor = .clear
@@ -84,15 +83,15 @@ class ChatMessageCell: UICollectionViewCell {
     
     @objc func handlePlay() {
         playButton.isHidden = true
-        if let videoUrl = message?.videoUrl , let url = NSURL(string: videoUrl) {
-            player = AVPlayer(url: url as URL)
+        
+        if let videoUrl = message?.videoUrl , let url = URL(string: videoUrl) {
+            player = AVPlayer(url: url)
             
             playerLayer = AVPlayerLayer(player: player)
             playerLayer!.frame = bubbleView.bounds
             bubbleView.layer.addSublayer(playerLayer!)
             player!.play()
             activityIndicatorView.startAnimating()
-            
             
         }
     }
@@ -105,7 +104,6 @@ class ChatMessageCell: UICollectionViewCell {
     }
     
     @objc func handle(tapGesture : UITapGestureRecognizer) {
-        print("tap")
         if let imageView = tapGesture.view as? UIImageView {
             self.chatLogController?.performZoomInForStartingImageView(startingImageView: imageView)
         }

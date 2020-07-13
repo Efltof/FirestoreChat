@@ -6,9 +6,14 @@
 //  Copyright © 2019 Alexander Kondrashin. All rights reserved.
 //
 
-import Foundation
+
 import UIKit
+import FirebaseFirestore
+import FirebaseAuth
 import Firebase
+import CoreServices
+import AVFoundation
+
 
 
 extension LoginController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -26,7 +31,6 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     @objc func handleRegister() {
         
         guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text  else  {
-            print("Data is not correct")
             return
         }
         

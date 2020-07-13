@@ -36,8 +36,6 @@ class UserCell : UITableViewCell {
     private func setupNameAndProfileImage() {
         
         if let id = message?.chatPartnerId() {
-            print("got it")
-            print(id)
             let ref = Firestore.firestore().collection("users").document("\(id)")
             ref.getDocument(source: .default) { (snapshot, error) in
                 if let error = error {

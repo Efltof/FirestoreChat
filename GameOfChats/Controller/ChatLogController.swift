@@ -43,11 +43,10 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
                     
                     let message = Message(dictionary: dictionary)
                     
-                    print("we fetched this message \(message.text)")
                     if message.chatPartnerId() == self.user?.id {
                         self.messages.append(message)
 
-                        DispatchQueue.main.async {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
                             self.collectionView.reloadData()
                             let indexPath = IndexPath(item: self.messages.count - 1, section: 0)
                             self.collectionView.scrollToItem(at: indexPath, at: .bottom, animated: true)
@@ -57,13 +56,17 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             })
         }
     }
-    
+   
   public lazy var inputTextField : UITextField = {
-        let field = UITextField()
-        field.translatesAutoresizingMaskIntoConstraints = false
-        field.placeholder = "Enter your message..."
-        field.delegate = self
-        return field
+    let field = UITextField()
+    let myColor = UIColor.lightGray
+    field.layer.borderWidth = 2
+    field.layer.cornerRadius = 20
+    field.layer.borderColor = myColor.cgColor
+    field.translatesAutoresizingMaskIntoConstraints = false
+    field.placeholder = "   Enter your message..."
+    field.delegate = self
+    return field
     }()
     
    let cellId = "cellId"
@@ -99,6 +102,9 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         setupCell(cell: cell, message: message)
         
+        //for downloading video
+        cell.message = message
+        
         //modify bubbleView's width
         if let text = message.text {
             cell.bubbleWithAncher?.constant = estimateFrameForText(text: text).width + 30
@@ -111,6 +117,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         cell.playButton.isHidden = message.videoUrl == nil
         return cell
     }
+    
     //MARK: Setup Cell
     private func setupCell(cell: ChatMessageCell, message : Message) {
         if let profileImageUrl = self.user?.profileImageUrl {
@@ -142,8 +149,6 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             cell.bubbleViewLeftAnchor?.isActive = true
             
         }
-        
-        
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -211,7 +216,6 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     
-    
     var containerViewBottomAnchor: NSLayoutConstraint?
     
     func setInputComponents() {
@@ -227,7 +231,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         containerViewBottomAnchor?.isActive = true
         
         containerView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        containerView.heightAnchor.constraint(equalToConstant:  50).isActive = true
+        containerView.heightAnchor.constraint(equalToConstant: 60).isActive = true
         
         let uploadImageView = UIButton(type: .custom)
         uploadImageView.setImage(UIImage(named: "upload_icon_image"), for: .normal)
@@ -237,30 +241,33 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         
         //x,y,width, height
         uploadImageView.leftAnchor.constraint(equalTo: containerView.leftAnchor).isActive = true
-        uploadImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        uploadImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -8).isActive = true
         uploadImageView.widthAnchor.constraint(equalToConstant: 44).isActive = true
         uploadImageView.heightAnchor.constraint(equalToConstant: 44).isActive = true
         
-
         
         let sendButton = UIButton(type: .system)
-        sendButton.setTitle("Send", for: .normal)
+        sendButton.setImage(UIImage(named: "upArrowAll"), for: .normal)
+        sendButton.tintColor = .gray
+        
+        //sendButton.setTitle("Send", for: .normal)
         sendButton.translatesAutoresizingMaskIntoConstraints = false
         sendButton.addTarget(self, action: #selector(handleSender), for: .touchUpInside)
         containerView.addSubview(sendButton)
         //x,y,width, height
         sendButton.rightAnchor.constraint(equalTo: containerView.rightAnchor).isActive = true
-        sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
-        sendButton.widthAnchor.constraint(equalToConstant: 80).isActive = true
-        sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
-        
+        sendButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor, constant: -8).isActive = true
+        sendButton.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        sendButton.heightAnchor.constraint(equalToConstant: 44).isActive = true
+       
         containerView.addSubview(inputTextField)
         
         //x,y,width, height
         inputTextField.leftAnchor.constraint(equalTo: uploadImageView.rightAnchor,constant: 8).isActive = true
-        inputTextField.centerYAnchor.constraint(equalTo: containerView.centerYAnchor).isActive = true
+        inputTextField.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 4).isActive = true
         inputTextField.rightAnchor.constraint(equalTo: sendButton.leftAnchor).isActive = true
-        inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor).isActive = true
+        inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor, constant: -20).isActive = true
+        
         
         let separatorView = UIView()
         separatorView.backgroundColor = UIColor(r: 220, g: 220, b: 220)
@@ -297,16 +304,19 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
             dismiss(animated: true, completion: nil)
         }
     
+    var urlForDownloadVideo : URL?
+    
    private func handleVideoSelectedForUrl(videoUrl : URL) {
-            //попробовать изменить вариант загрузки на putFile(fromUrl)
-            print("url for this file is: ", videoUrl)
-        let filename = NSUUID().uuidString + ".mov"
+            let filename = NSUUID().uuidString + ".mov"
             
     let ref = Storage.storage().reference().child("message_movies").child(filename)
             ref.putFile(from: videoUrl, metadata: nil) { (metadata, error) in
                 if error != nil {
                     print(error)
                     return
+                }
+                ref.downloadURL { (url, error) in
+                    self.urlForDownloadVideo = url
                 }
                 self.videoUrl = videoUrl
                 if let thumbnailImage = self.thumbnailImageForFileUrl(fileUrl: videoUrl) {
@@ -316,7 +326,7 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     func setAndSendProperties(imageUrl: String, image: UIImage) {
-        guard let urlForVideo = videoUrl else { return }
+        guard let urlForVideo = urlForDownloadVideo else { return }
         let properties : [String : Any] = ["imageUrl": imageUrl, "imageWidth" : image.size.width, "imageHeight" : image.size.height, "videoUrl" : urlForVideo.absoluteString]
         self.sendMessageWithProperties(properties: properties)
     }
@@ -391,8 +401,12 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     }
     
     @objc func handleSender() {
-        var properties : [String : Any] = ["text" : inputTextField.text!]
-        sendMessageWithProperties(properties: properties)
+        if inputTextField.text == "" || inputTextField.text == nil {
+            return
+        } else {
+            let properties : [String : Any] = ["text" : inputTextField.text!]
+            sendMessageWithProperties(properties: properties)
+        }
     }
     
     private func sendMessageWithProperties(properties: [String : Any]) {
@@ -405,14 +419,12 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
         var values : [String : Any] = ["toId" : toId, "fromId" : fromId, "timestamp" : timestamp]
         
         properties.forEach {( values[$0] = $1 )}
-        
+    
         
         ref.setData(values) { (error) in
             if error != nil {
                 print(error)
             } else {
-                print("success")
-                
                 let messageId = ref.documentID
                 //step 1
                 let userRef = Firestore.firestore().collection("user-messages").document(fromId!).collection("users").document(toId!)
@@ -451,7 +463,6 @@ class ChatLogController: UICollectionViewController, UITextFieldDelegate, UIColl
     func performZoomInForStartingImageView(startingImageView: UIImageView) {
         self.startingImageView = startingImageView
         startingFrame = startingImageView.superview?.convert(startingImageView.frame, to: nil)
-        print(startingImageView)
         let zoomingImageView = UIImageView(frame: startingFrame!)
         zoomingImageView.image = startingImageView.image
         zoomingImageView.isUserInteractionEnabled = true
